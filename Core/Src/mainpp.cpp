@@ -3,7 +3,7 @@
 #include "std_msgs/String.h"
 
 #include "string"
-extern int b_bool, y_bool, p_bool, h_bool;
+extern int b_bool, y_bool, p_bool, h_bool ;
 extern char hole[4];
 extern short int mission_array[5];
 extern int counttry;
