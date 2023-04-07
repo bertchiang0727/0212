@@ -1,0 +1,2 @@
+../Core/Src/Servo.c:12:6:UART_Send	24	static
+../Core/Src/Servo.c:19:6:UART_Send_SetMotorPosition	16	static

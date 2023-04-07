@@ -1,0 +1,7 @@
+cake.c:34:6:suck_the_cake	8
+cake.c:68:6:press_sensor_feedback	8
+cake.c:90:6:unsuck_the_cake	8
+cake.c:123:6:rotate_the_ring	11
+cake.c:168:6:put_the_cherry	1
+cake.c:173:6:judge_the_empty_and_order	80
+cake.c:371:6:Tower_of_Hanoi	8
