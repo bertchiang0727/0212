@@ -1,0 +1,3 @@
+../Core/Src/VL53.c:29:6:VL53_Init	48	static
+../Core/Src/VL53.c:108:6:VL53_FirstMeasurement	40	static
+../Core/Src/VL53.c:131:6:VL53_Update	16	static

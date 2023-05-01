@@ -1,7 +1,7 @@
-cake.c:34:6:suck_the_cake	8
-cake.c:68:6:press_sensor_feedback	8
-cake.c:90:6:unsuck_the_cake	8
-cake.c:123:6:rotate_the_ring	11
-cake.c:168:6:put_the_cherry	1
-cake.c:173:6:judge_the_empty_and_order	80
-cake.c:371:6:Tower_of_Hanoi	8
+cake.c:39:6:suck_the_cake	8
+cake.c:73:6:press_sensor_feedback	8
+cake.c:95:6:unsuck_the_cake	9
+cake.c:132:6:rotate_the_ring	23
+cake.c:228:6:put_the_cherry	7
+cake.c:268:6:judge_the_empty_and_order	80
+cake.c:467:6:Tower_of_Hanoi	8

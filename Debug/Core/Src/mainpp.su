@@ -52,12 +52,13 @@
 ../Core/Inc/std_msgs/String.h:49:18:virtual const char* std_msgs::String::getType()	16	static
 ../Core/Inc/std_msgs/String.h:50:18:virtual const char* std_msgs::String::getMD5()	16	static
 c:\st\stm32cubeide_1.9.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.200.202301161003\tools\bin\../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m+fp/hard/bits/gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
-../Core/Src/mainpp.cpp:11:6:void cake_callback(const std_msgs::String&)	16	static
-../Core/Src/mainpp.cpp:41:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/mainpp.cpp:48:6:void HAL_UART_ErrorCallback(UART_HandleTypeDef*)	16	static
-../Core/Src/mainpp.cpp:56:6:void pub_to_ros()	8	static
-../Core/Src/mainpp.cpp:67:6:void setup()	8	static
-../Core/Src/mainpp.cpp:74:6:void loop()	8	static
+../Core/Src/mainpp.cpp:12:6:void cake_callback(const std_msgs::String&)	16	static
+../Core/Src/mainpp.cpp:43:6:void HAL_UART_TxCpltCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/mainpp.cpp:50:6:void HAL_UART_ErrorCallback(UART_HandleTypeDef*)	16	static
+../Core/Src/mainpp.cpp:58:6:void pub_to_ros()	8	static
+../Core/Src/mainpp.cpp:68:6:void pub_the_gate()	8	static
+../Core/Src/mainpp.cpp:73:6:void setup()	8	static
+../Core/Src/mainpp.cpp:81:6:void loop()	8	static
 ../Core/Inc/ros/msg.h:129:15:static void ros::Msg::varToArr(A, V) [with A = unsigned char*; V = long unsigned int]	24	static
 ../Core/Inc/ros/msg.h:137:15:static void ros::Msg::arrToVar(V&, A) [with V = long unsigned int; A = unsigned char*]	24	static
 ../Core/Inc/ros/node_handle.h:50:7:constexpr ros::NodeHandleBase_::NodeHandleBase_()	16	static
@@ -76,10 +77,10 @@ c:\st\stm32cubeide_1.9.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externalt
 ../Core/Inc/ros/node_handle.h:402:8:void ros::NodeHandle_<Hardware, MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE>::setNow(ros::Time&) [with Hardware = STM32Hardware; int MAX_SUBSCRIBERS = 25; int MAX_PUBLISHERS = 25; int INPUT_SIZE = 512; int OUTPUT_SIZE = 512]	24	static
 ../Core/Inc/ros/node_handle.h:573:8:void ros::NodeHandle_<Hardware, MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE>::logerror(const char*) [with Hardware = STM32Hardware; int MAX_SUBSCRIBERS = 25; int MAX_PUBLISHERS = 25; int INPUT_SIZE = 512; int OUTPUT_SIZE = 512]	16	static
 ../Core/Inc/ros/node_handle.h:552:8:void ros::NodeHandle_<Hardware, MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE>::log(char, const char*) [with Hardware = STM32Hardware; int MAX_SUBSCRIBERS = 25; int MAX_PUBLISHERS = 25; int INPUT_SIZE = 512; int OUTPUT_SIZE = 512]	40	static
-../Core/Src/mainpp.cpp:77:1:void __static_initialization_and_destruction_0(int, int)	16	static
+../Core/Src/mainpp.cpp:84:1:void __static_initialization_and_destruction_0(int, int)	16	static
 ../Core/Inc/ros/subscriber.h:114:16:void ros::Subscriber<MsgT, void>::callback(unsigned char*) [with MsgT = std_msgs::String]	16	static
 ../Core/Inc/ros/subscriber.h:128:15:int ros::Subscriber<MsgT, void>::getEndpointType() [with MsgT = std_msgs::String]	16	static
 ../Core/Inc/ros/subscriber.h:120:24:const char* ros::Subscriber<MsgT, void>::getMsgType() [with MsgT = std_msgs::String]	16	static
 ../Core/Inc/ros/subscriber.h:124:24:const char* ros::Subscriber<MsgT, void>::getMsgMD5() [with MsgT = std_msgs::String]	16	static
 ../Core/Inc/ros/node_handle.h:363:16:bool ros::NodeHandle_<Hardware, MAX_SUBSCRIBERS, MAX_PUBLISHERS, INPUT_SIZE, OUTPUT_SIZE>::connected() [with Hardware = STM32Hardware; int MAX_SUBSCRIBERS = 25; int MAX_PUBLISHERS = 25; int INPUT_SIZE = 512; int OUTPUT_SIZE = 512]	16	static
-../Core/Src/mainpp.cpp:77:1:cpp)	8	static
+../Core/Src/mainpp.cpp:84:1:cpp)	8	static

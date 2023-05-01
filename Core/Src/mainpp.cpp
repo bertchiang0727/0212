@@ -3,9 +3,10 @@
 #include "std_msgs/String.h"
 
 #include "string"
-extern int b_bool, y_bool, p_bool, h_bool ;
+extern int b_bool, y_bool, p_bool, h_bool;
 extern char hole[4];
-extern short int mission_array[5];
+extern short int mission_array[5], rotate_state[3];
+
 extern int counttry;
 extern int tower_step, temp_pub;
 void cake_callback(const std_msgs::String &msg) {
@@ -26,18 +27,19 @@ void cake_callback(const std_msgs::String &msg) {
 	else if (msg.data[0] == 'h' && h_bool == 0) {
 		h_bool = 1;
 		mission_array[0] = 0;
+		temp_pub = 0;
 	}
 }
 
 // (1) Data you want publish
 std_msgs::Int16MultiArray feedback;
-
+std_msgs::Int16MultiArray gate;
 ros::NodeHandle nh;
 ros::Subscriber<std_msgs::String> sub("mission0", cake_callback);
 
 // (2) Create a publisher
 ros::Publisher pub("donefullness0", &feedback);
-
+ros::Publisher pub1("lightgate0", &gate);
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	nh.getHardware()->flush();
 }
@@ -63,13 +65,18 @@ void pub_to_ros() {
 
 	pub.publish(&feedback);
 }
-
+void pub_the_gate() {
+	gate.data_length = 3;
+	gate.data = rotate_state;
+	pub1.publish(&gate);
+}
 void setup(void) {
 	nh.initNode();
 	nh.subscribe(sub);
 
 	// (3) Init your publisher with roscore
 	nh.advertise(pub);
+	nh.advertise(pub1);
 }
 void loop(void) {
 	nh.spinOnce();

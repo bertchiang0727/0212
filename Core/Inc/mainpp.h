@@ -14,6 +14,7 @@ extern "C" {
 void setup(void);
 void loop(void);
 void pub_to_ros();
+void pub_the_gate();
 //extern void MX_USART1_UART_Init(void);
 
 #ifdef __cplusplus

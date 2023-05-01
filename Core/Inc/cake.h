@@ -9,8 +9,8 @@
 #define Step1_DIR_Pin GPIO_PIN_12
 void suck_the_cake(int servonum, int order);
 void unsuck_the_cake(int servonum, int order);
-void rotate_the_ring(int num);
+void rotate_the_ring(int numb);
 void judge_the_empty_and_order();
 void Tower_of_Hanoi(int cake_order);
 void press_sensor_feedback();
-void put_the_cherry(int num);
+void put_the_cherry(int numb);

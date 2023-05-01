@@ -25,16 +25,21 @@ extern int unsuck_success1, unsuck_success4, unsuck_success3;
 extern int i1, i2, i3, i4, i5, i6;
 extern int suck_temp, unsuck_temp;
 extern int cake_order;
-int num;
+extern int num, rotate;
 extern char hole[4];
-extern int arr;
+extern int arr, step;
 extern short int mission_array[5];
-extern int unsuck_delay, suck_delay, servo_delay;
-extern int unsuck_delay_temp, suck_delay_temp, servo_delay_temp;
+extern int unsuck_delay, suck_delay, servo_delay, cherry_delay;
+extern int unsuck_delay_temp, suck_delay_temp, servo_delay_temp,
+		cherry_delay_temp;
+extern int rotate_state[3], rotate_dir, rotate_temp, temp_pub;
+int s = 0;
+int step_debug;
+int rotate_offset = 0;
 void suck_the_cake(int servonum, int order) {
 
 	while (1) {
-		if (step1 == 0) {
+		if (step == 0) {
 			break;
 		}
 
@@ -58,11 +63,11 @@ void suck_the_cake(int servonum, int order) {
 		suck_temp++;
 	}
 	if (order == 1)
-		UART_Send_SetMotorPosition(servonum, 1780, 500); // suck the top cake
+		UART_Send_SetMotorPosition(servonum, 1500, 300); // suck the top cake
 	else if (order == 2)
-		UART_Send_SetMotorPosition(servonum, 1880, 500); // suck the middle cake
+		UART_Send_SetMotorPosition(servonum, 1620, 300); // suck the middle cake
 	else if (order == 3)
-		UART_Send_SetMotorPosition(servonum, 2080, 500); // suck the bottom cake
+		UART_Send_SetMotorPosition(servonum, 1750, 300); // suck the bottom cake
 
 }
 void press_sensor_feedback() {          // wait for press_sensor feedback
@@ -90,17 +95,21 @@ void press_sensor_feedback() {          // wait for press_sensor feedback
 void unsuck_the_cake(int servonum, int order) {
 
 	while (1) {
-		if (step1 == 0)
+		if (step == 0)
 			break;
 	}
 
 	if (order == 1)
-		UART_Send_SetMotorPosition(servonum, 1780, 500); // put the cake to the top 1320
+		UART_Send_SetMotorPosition(servonum, 1480, 300); // put the cake to the top 1320
 	else if (order == 2)
-		UART_Send_SetMotorPosition(servonum, 1780, 500); // put the cake to the middle 1225
+		UART_Send_SetMotorPosition(servonum, 1480, 300); // put the cake to the middle 1225
 	else if (order == 3)
-		UART_Send_SetMotorPosition(servonum, 1780, 500); // put the cake to the bottom 1100
-
+		UART_Send_SetMotorPosition(servonum, 1480, 300); // put the cake to the bottom 1100
+	servo_delay_temp = 1;
+	while (1) {
+		if (servo_delay_temp == 0)
+			break;
+	}
 	if (servonum == 1) {
 		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 2000 * 255); // open valve1
 		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0);          // close pump1
@@ -120,55 +129,141 @@ void unsuck_the_cake(int servonum, int order) {
 		unsuck_temp++;
 	}
 }
-void rotate_the_ring(int num) {
-	if (num == 1) {
+void rotate_the_ring(int numb) {
+	if (num == 1 && cake_order != -1) {
+		rotate_offset = ((numb + 2 - 1) % 4);
+		if (rotate_offset == 0)
+			rotate_offset = 4;
+		numb = rotate_offset;
+	}
+	else if (num == 2 && cake_order != -1) {
+		rotate_offset = (numb + 3 - 1) % 4;
+		if (rotate_offset == 0)
+			rotate_offset = 4;
+
+		numb = rotate_offset;
+	}
+	else if (num == 3 && cake_order != -1) {
+		rotate_offset = (numb + 4 - 1) % 4;
+		if (rotate_offset == 0)
+			rotate_offset = 4;
+
+		numb = rotate_offset;
+	}
+	rotate_state[0] = 0;
+	rotate_state[1] = 0;
+	rotate_state[2] = 0;
+	if (numb == 1) {
 		step1 = 0;
 		anglegoal = 0;
+
 	}
-	else if (num == 2) {
+	else if (numb == 2) {
 		step1 = 0;
 		anglegoal = 90;
 	}
-	else if (num == 3) {
+	else if (numb == 3) {
 		step1 = 0;
 		anglegoal = 180;
 	}
-	else if (num == 4) {
+	else if (numb == 4) {
 		step1 = 0;
 		anglegoal = 270;
 	}
-	else if (num == 5) {
-		step1 = 0;
-		anglegoal = -90;
-	}
-	else if (num == 6) {
-		step1 = 0;
-		anglegoal = -180;
-	}
-	else if (num == 7) {
-		step1 = 0;
-		anglegoal = -270;
-	}
+//	else if (numb == 5) {
+//		step1 = 0;
+//		anglegoal = -90;
+//	}
+//	else if (numb == 6) {
+//		step1 = 0;
+//		anglegoal = -180;
+//	}
+//	else if (numb == 7) {
+//		step1 = 0;
+//		anglegoal = -270;
+//	}
 	step1 = (anglegoal - anglebefore) * 5 * 8 / 1.8; // calculate the step1
-	anglebefore = anglegoal;
-	if (step1 >= 0)
-		dir_state1 = 1;
-	else if (step1 < 0) {
-		step1 = -step1;
-		dir_state1 = 0;
+	if (step1 > 4000) {
+		step1 = step1 - 8000;
+	}
+	else if (step1 < -4000) {
+		step1 = 8000 + step1;
 	}
 
+	rotate_temp = 0;
+	anglebefore = anglegoal;
+	if (step1 >= 0) {
+		dir_state1 = 1;
+
+	}
+
+	else if (step1 < 0) {
+		step1 = -step1;
+
+		dir_state1 = 0;
+	}
+	step1 = step1 + 500;
+	step = step1;
+	step_debug = step;
 	while (1) {
-		if (step1 == 0) {
-			arr = 500;
+		if (numb == rotate_dir) {
+
+			step = 2.86 * 5 * 8 / 1.8;
+			step_debug = step;
+			s++;
+			numb = 0;
+		}
+		if (step == 0 && numb == 0) {
+			arr = 1000;
+
 			break;
+		}
+		else if (step == 0 && numb != 0) {
+
+			step = 90 * 5 * 8 / 1.8;
+			step_debug = step;
 		}
 	}
 }
-void put_the_cherry(int num) {
-	rotate_the_ring(num);
-	UART_Send_SetMotorPosition(6, 2100, 300);
-	UART_Send_SetMotorPosition(6, 950, 300);
+void put_the_cherry(int numb) {
+
+	rotate_the_ring(numb);
+	while (1) {
+		if (step == 0) {
+			break;
+		}
+	}
+	UART_Send_SetMotorPosition(5, 1330, 300);
+	servo_delay_temp = 1;
+	while (1) {
+		if (servo_delay_temp == 0)
+			break;
+	}
+	UART_Send_SetMotorPosition(6, 2100, 500);
+	servo_delay_temp = 1;
+	while (1) {
+		if (servo_delay_temp == 0)
+			break;
+	}
+	cherry_delay_temp = 1;
+	while (1) {
+		if (cherry_delay_temp == 0)
+			break;
+	}
+	UART_Send_SetMotorPosition(5, 1200, 300);
+
+	servo_delay_temp = 1;
+	while (1) {
+		if (servo_delay_temp == 0)
+			break;
+	}
+	UART_Send_SetMotorPosition(6, 850, 500);
+	servo_delay_temp = 1;
+	while (1) {
+		if (servo_delay_temp == 0)
+			break;
+	}
+
 }
 void judge_the_empty_and_order() {
 //1=leftfront,2=rightfront,3=rightback,4=leftback
@@ -181,7 +276,7 @@ void judge_the_empty_and_order() {
 	}
 	if (num == 1) {
 		rotate_the_ring(2);       //90
-		anglebefore = 0;
+
 		if (hole[1] == 'b' && hole[2] == 'y' && hole[3] == 'p') {
 			cake_order = 1;
 			mission_array[1] = 1;
@@ -226,8 +321,9 @@ void judge_the_empty_and_order() {
 		}
 	}
 	else if (num == 2) {
-		rotate_the_ring(6);       //-180
-		anglebefore = 0;
+		rotate = 3;
+		rotate_the_ring(3);       //-180
+
 		if (hole[2] == 'b' && hole[3] == 'y' && hole[0] == 'p') {
 			cake_order = 1;
 			mission_array[1] = 0;
@@ -272,7 +368,7 @@ void judge_the_empty_and_order() {
 		}
 	}
 	else if (num == 3) {
-		rotate_the_ring(5);       //-90
+		rotate_the_ring(4);       //-90
 		anglebefore = 0;
 		if (hole[3] == 'b' && hole[0] == 'y' && hole[1] == 'p') {
 			cake_order = 1;
@@ -363,7 +459,7 @@ void judge_the_empty_and_order() {
 		}
 	}
 	while (1) {
-		if (step1 == 0)
+		if (step == 0)
 			break;
 	}
 }
@@ -377,19 +473,19 @@ void Tower_of_Hanoi(int cake_order) {
 	suck_the_cake(3, 1);
 	press_sensor_feedback();
 	if (cake_order == 1) {
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		tower_step = 1;
 
 		unsuck_the_cake(1, 3);
 		press_sensor_feedback();
 		tower_step = 2;
 
-		rotate_the_ring(6);
+		rotate_the_ring(3);
 		unsuck_the_cake(4, 2);
 		press_sensor_feedback();
 		tower_step = 3;
 
-		rotate_the_ring(7);
+		rotate_the_ring(2);
 		unsuck_the_cake(3, 1);
 		press_sensor_feedback();
 		tower_step = 4;
@@ -401,12 +497,12 @@ void Tower_of_Hanoi(int cake_order) {
 		press_sensor_feedback();
 		tower_step = 5;
 
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(4, 2);
 		press_sensor_feedback();
 		tower_step = 6;
 
-		rotate_the_ring(6);
+		rotate_the_ring(3);
 		unsuck_the_cake(3, 1);
 		press_sensor_feedback();
 		tower_step = 7;
@@ -427,15 +523,17 @@ void Tower_of_Hanoi(int cake_order) {
 		press_sensor_feedback();
 		tower_step = 10;
 
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(3, 1);
 		press_sensor_feedback();
 		tower_step = 11;
 		put_the_cherry(1);
 		put_the_cherry(2);
 		put_the_cherry(3);
-		mission_array[0] = 1;
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 
 	else if (cake_order == 2) {
@@ -463,7 +561,7 @@ void Tower_of_Hanoi(int cake_order) {
 		suck_the_cake(4, 3);
 		suck_the_cake(1, 3);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(3, 3);
 		press_sensor_feedback();
 		rotate_the_ring(1);
@@ -473,10 +571,12 @@ void Tower_of_Hanoi(int cake_order) {
 		unsuck_the_cake(1, 1);
 		press_sensor_feedback();
 		put_the_cherry(1);
-		put_the_cherry(5);
-		put_the_cherry(6);
-		mission_array[0] = 1;
+		put_the_cherry(4);
+		put_the_cherry(3);
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 
 	else if (cake_order == 3) {
@@ -497,7 +597,7 @@ void Tower_of_Hanoi(int cake_order) {
 		rotate_the_ring(2);
 		unsuck_the_cake(1, 2);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(3, 1);
 		press_sensor_feedback();
 		rotate_the_ring(1);
@@ -514,61 +614,81 @@ void Tower_of_Hanoi(int cake_order) {
 		unsuck_the_cake(3, 1);
 		press_sensor_feedback();
 		put_the_cherry(1);
-		put_the_cherry(5);
-		put_the_cherry(6);
-		mission_array[0] = 1;
+		put_the_cherry(4);
+		put_the_cherry(3);
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 
 	else if (cake_order == 4) {
-		rotate_the_ring(6);
+		rotate = 3;
+		rotate_the_ring(3);
 		unsuck_the_cake(4, 3);
 		press_sensor_feedback();
-		rotate_the_ring(7);
+		rotate = 2;
+		rotate_the_ring(2);
+
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate = 4;
+		rotate_the_ring(4);
+
 		unsuck_the_cake(1, 1);
 		press_sensor_feedback();
+		rotate = 1;
 		rotate_the_ring(1);
+
 		suck_the_cake(1, 2);
 		suck_the_cake(4, 2);
 		suck_the_cake(3, 2);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate = 4;
+		rotate_the_ring(4);
+
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
+		rotate = 2;
 		rotate_the_ring(2);
+
 		unsuck_the_cake(1, 1);
 		press_sensor_feedback();
+		rotate = 1;
 		rotate_the_ring(1);
+
 		suck_the_cake(1, 3);
 		suck_the_cake(3, 3);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate = 4;
+		rotate_the_ring(4);
 		unsuck_the_cake(4, 3);
 		press_sensor_feedback();
-		rotate_the_ring(6);
+		rotate = 3;
+		rotate_the_ring(3);
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
+		rotate = 1;
 		rotate_the_ring(1);
 		unsuck_the_cake(1, 1);
 		press_sensor_feedback();
 		put_the_cherry(1);
 		put_the_cherry(2);
 		put_the_cherry(3);
-		mission_array[0] = 1;
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 
 	else if (cake_order == 5) {
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(1, 3);
 		press_sensor_feedback();
-		rotate_the_ring(7);
+		rotate_the_ring(2);
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
-		rotate_the_ring(6);
+		rotate_the_ring(3);
 		unsuck_the_cake(4, 1);
 		press_sensor_feedback();
 		rotate_the_ring(1);
@@ -576,10 +696,10 @@ void Tower_of_Hanoi(int cake_order) {
 		suck_the_cake(4, 2);
 		suck_the_cake(3, 2);
 		press_sensor_feedback();
-		rotate_the_ring(6);
+		rotate_the_ring(3);
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(4, 1);
 		press_sensor_feedback();
 		rotate_the_ring(1);
@@ -589,7 +709,7 @@ void Tower_of_Hanoi(int cake_order) {
 		rotate_the_ring(2);
 		unsuck_the_cake(1, 3);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(3, 2);
 		press_sensor_feedback();
 		rotate_the_ring(1);
@@ -598,8 +718,10 @@ void Tower_of_Hanoi(int cake_order) {
 		put_the_cherry(1);
 		put_the_cherry(2);
 		put_the_cherry(3);
-		mission_array[0] = 1;
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 
 	else if (cake_order == 6) {
@@ -627,7 +749,7 @@ void Tower_of_Hanoi(int cake_order) {
 		suck_the_cake(4, 3);
 		suck_the_cake(1, 3);
 		press_sensor_feedback();
-		rotate_the_ring(5);
+		rotate_the_ring(4);
 		unsuck_the_cake(3, 3);
 		press_sensor_feedback();
 		rotate_the_ring(2);
@@ -637,9 +759,11 @@ void Tower_of_Hanoi(int cake_order) {
 		unsuck_the_cake(4, 1);
 		press_sensor_feedback();
 		put_the_cherry(1);
-		put_the_cherry(5);
-		put_the_cherry(6);
-		mission_array[0] = 1;
+		put_the_cherry(4);
+		put_the_cherry(3);
+
 		rotate_the_ring(1);
+		mission_array[0] = 2;
+		temp_pub = 0;
 	}
 }
