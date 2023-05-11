@@ -32,9 +32,9 @@ Core/Src/cake.o: ../Core/Src/cake.c ../Core/Inc/cake.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/main.h ../Core/Inc/adc.h ../Core/Inc/main.h \
- ../Core/Inc/dma.h ../Core/Inc/tim.h ../Core/Inc/usart.h \
- ../Core/Inc/gpio.h
+ ../Core/Inc/VL53.h ../Core/Inc/main.h ../Core/Inc/adc.h \
+ ../Core/Inc/main.h ../Core/Inc/dma.h ../Core/Inc/tim.h \
+ ../Core/Inc/usart.h ../Core/Inc/gpio.h ../Core/Inc/XBee_TX.h
 ../Core/Inc/cake.h:
 ../Core/Inc/Servo.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -70,6 +70,7 @@ Core/Src/cake.o: ../Core/Src/cake.c ../Core/Inc/cake.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+../Core/Inc/VL53.h:
 ../Core/Inc/main.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/main.h:
@@ -77,3 +78,4 @@ Core/Src/cake.o: ../Core/Src/cake.c ../Core/Inc/cake.h \
 ../Core/Inc/tim.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
+../Core/Inc/XBee_TX.h:

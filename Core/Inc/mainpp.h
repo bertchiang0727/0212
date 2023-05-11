@@ -15,6 +15,8 @@ void setup(void);
 void loop(void);
 void pub_to_ros();
 void pub_the_gate();
+void pub_the_hand_transfer();
+void hand_shake();
 //extern void MX_USART1_UART_Init(void);
 
 #ifdef __cplusplus

@@ -32,7 +32,7 @@ uint8_t bee(char *str) {
 		data = 'h';
 	}
 	else if (strcmp((char*) str, (char*) "end") == 0) {
-		data = 'e';
+		data = 'o';
 	}
 	else {
 		data = 'X';

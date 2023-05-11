@@ -102,10 +102,14 @@ int main(void)
   MX_TIM10_Init();
   MX_TIM11_Init();
   MX_I2C1_Init();
+  MX_TIM13_Init();
+  MX_TIM8_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 	// DMA_init is in front of ADC
 	setup();
 	mainrun();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
