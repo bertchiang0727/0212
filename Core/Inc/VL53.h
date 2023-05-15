@@ -1,8 +1,6 @@
 #ifndef _VL53_H_
 #define _VL53_H_
 
-#define CAKE_HEIGHT 20
-
 // This array will store the amount of cake in that position.
 extern int CakeStatus[3];
 extern int VL53_RangeResult[3];

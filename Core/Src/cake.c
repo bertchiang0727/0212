@@ -20,13 +20,13 @@ extern int8_t VL53_Status;
 extern int step1, dir_state1, anglegoal, anglebefore;
 extern int states;
 extern int step_state1, ms1;
-extern int suck[3], unsuck[3];
+extern int suck[4], unsuck[4];
 extern int suck_success1, suck_success4, suck_success3;
 extern int unsuck_success1, unsuck_success4, unsuck_success3;
 extern int i1, i2, i3, i4, i5, i6;
 extern int suck_temp, unsuck_temp;
 extern int cake_order;
-extern int num, rotate;
+extern int num, rotate, S, US;
 extern char hole[4];
 extern int arr, step, pauseHanoi, homefree;
 extern short int mission_array[5];
@@ -49,69 +49,62 @@ int first_state[3] = { 0 };
 extern int disguise, home, steal, putcherry, score_flag[10];
 extern uint8_t score;
 char scorecount[15] = { 0 };
+extern int transfer_the_order;
 void score_transfer() {
 	if (steady == 1
 			&& (score_flag[0] == 1 || score_flag[1] == 1 || score_flag[2] == 1
 					|| score_flag[3] == 1)) {
+		score = bee("legend");
+		HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("legend")));
 
-		strcpy(scorecount, "legend");
-		score = bee(scorecount);
-		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-
-		strcpy(scorecount, "cherry");
-		score = bee(scorecount);
-		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+//		strcpy(scorecount, "cherry");
+//		score = bee(scorecount);
+//		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
 
 	}
-	if (steady == 0) {
+	else if (steady == 0) {
 		for (int i = 0; i < 4; i++) {
 			if (first_state[i] == 1 && score_flag[i] == 1) {
-				strcpy(scorecount, "one");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-				strcpy(scorecount, "cherry");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+				score = bee("one");
+				HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("one")));
+//				strcpy(scorecount, "cherry");
+//				score = bee(scorecount);
+//				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
 			}
 			else if (first_state[i] == 2 && score_flag[i] == 1) {
-				strcpy(scorecount, "two");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-				strcpy(scorecount, "cherry");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+				score = bee("two");
+				HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("two")));
+//				strcpy(scorecount, "cherry");
+//				score = bee(scorecount);
+//				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
 			}
 			else if (first_state[i] == 3 && score_flag[i] == 1) {
-				strcpy(scorecount, "three");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-				strcpy(scorecount, "cherry");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+				score = bee("three");
+				HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("three")));
+//				strcpy(scorecount, "cherry");
+//				score = bee(scorecount);
+//				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+
 			}
 		}
 	}
-//	if (disguise == 1 && score_flag[4] == 1) {
-//		strcpy(scorecount, "funny");
-//		score = bee(scorecount);
-//		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-//	}
-//	if (finish == 1 && score_flag[5] == 1) {
-//		strcpy(scorecount, "end");
-//		score = bee(scorecount);
-//		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-//	}
-//	if (home == 1 && score_flag[6] == 1) {
-//		strcpy(scorecount, "home");
-//		score = bee(scorecount);
-//		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
-//	}
+	if (disguise == 1 && score_flag[4] == 1) {
+		score = bee("funny");
+		HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+	}
+	if (finish == 1 && score_flag[5] == 1) {
+		score = bee("end");
+		HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("end")));
+	}
+	if (home == 1 && score_flag[6] == 1) {
+		score = bee("home");
+		HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("home")));
+	}
 	if (steal != 0 && score_flag[7] == 1) {
 		for (int i = 1; i < 4; i++) {
 			if (steal >= i) {
-				strcpy(scorecount, "steal");
-				score = bee(scorecount);
-				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
+				score = bee("steal");
+				HAL_UART_Transmit_IT(&huart1, &score, sizeof(bee("steal")));
 			}
 		}
 		steal = 0;
@@ -199,15 +192,41 @@ void suck_the_cake(int servonum, int order) {
 		suck_temp++;
 	}
 	hand_transfer_fn();
-	if (order == 1)
-		UART_Send_SetMotorPosition(servonum, 1510, 200); // suck the top cake
-	else if (order == 2)
-		UART_Send_SetMotorPosition(servonum, 1600, 200); // suck the middle cake
-	else if (order == 3)
-		UART_Send_SetMotorPosition(servonum, 1730, 200); // suck the bottom cake
-	else if (order == 0)
+	if (order == 1) {
+//		if (servonum == 7)
+		UART_Send_SetMotorPosition(servonum, 1500, 200); // suck the top cake
+		S = 1;
+//		if (servonum == 7) {
+//			UART_Send_SetMotorPosition(servonum, 1490, 200); // suck the top cake
+//		}
+	}
+
+	else if (order == 2) {
+//		if (servonum != 7)
+		UART_Send_SetMotorPosition(servonum, 1590, 200); // suck the middle cake
+		S = 2;
+//		if (servonum == 7)
+//			UART_Send_SetMotorPosition(servonum, 1560, 200); // suck the top cake
+	}
+
+	else if (order == 3) {
+//		if (servonum != 7)
+		UART_Send_SetMotorPosition(servonum, 1715, 200); // suck the bottom cake
+		S = 3;
+//	if (servonum == 7)
+//			UART_Send_SetMotorPosition(servonum, 1705, 200); // suck the top cake
+	}
+
+	else if (order == 0) {
+//		if (servonum != 7)
 		UART_Send_SetMotorPosition(servonum, 1440, 200);
+		S = 0;
+//		if (servonum == 7)
+//			UART_Send_SetMotorPosition(servonum, 1430, 200); // suck the top cake
+	}
+
 //	HAL_Delay(1000);
+
 }
 
 void press_sensor_feedback() {          // wait for press_sensor feedback
@@ -469,19 +488,33 @@ void put_the_cherry(int numb) {
 			break;
 		}
 	}
-
+	suck[3] = 1;
 	if (steady == 0) {
-		if (order_arror[(4 + rotate_offset) % 4] == 1)
+		if (order_arror[(4 + rotate_offset) % 4] == 1) {
 			UART_Send_SetMotorPosition(5, 1330, 300);
-		if (order_arror[(4 + rotate_offset) % 4] == 2)
-			UART_Send_SetMotorPosition(5, 1330, 300);
-		if (order_arror[(4 + rotate_offset) % 4] == 3)
+			S = 1;
+		}
+
+		if (order_arror[(4 + rotate_offset) % 4] == 2) {
+			UART_Send_SetMotorPosition(5, 1350, 300);
+			S = 2;
+		}
+		if (order_arror[(4 + rotate_offset) % 4] == 3) {
 			UART_Send_SetMotorPosition(5, 1450, 300);
-		else
+			S = 3;
+		}
+
+		else {
 			UART_Send_SetMotorPosition(5, 1330, 300);
+			S = 1;
+		}
+
 	}
-	if (steady == 1)
+	if (steady == 1) {
 		UART_Send_SetMotorPosition(5, 1330, 300);
+		S = 1;
+	}
+
 	servo_delay_temp = 1;
 	while (1) {
 		if (servo_delay_temp == 0)
@@ -499,6 +532,7 @@ void put_the_cherry(int numb) {
 			break;
 	}
 	UART_Send_SetMotorPosition(5, 1200, 300);
+	suck[3] = 0;
 
 	servo_delay_temp = 1;
 	while (1) {
@@ -528,8 +562,11 @@ void judge_the_empty_and_order() {
 	}
 
 	if (num == 1) {
-		rotate_the_ring(1);       //90
-		rotate_offset = 1;
+		if (transfer_the_order == 0) {
+			rotate_the_ring(1);       //90
+			rotate_offset = 1;
+		}
+
 		if (hole[1] == 'b' && hole[2] == 'y' && hole[3] == 'p') {
 			cake_order = 1;
 			mission_array[1] = 1;
@@ -574,9 +611,12 @@ void judge_the_empty_and_order() {
 		}
 	}
 	else if (num == 2) {
-		rotate = 2;
-		rotate_the_ring(2);       //-180
-		rotate_offset = 2;
+		if (transfer_the_order == 0) {
+			rotate = 2;
+			rotate_the_ring(2);       //-180
+			rotate_offset = 2;
+		}
+
 		if (hole[2] == 'b' && hole[3] == 'y' && hole[0] == 'p') {
 			cake_order = 1;
 			mission_array[1] = 0;
@@ -621,8 +661,10 @@ void judge_the_empty_and_order() {
 		}
 	}
 	else if (num == 3) {
-		rotate_the_ring(3);
-		rotate_offset = 3;
+		if (transfer_the_order == 0) {
+			rotate_the_ring(3);
+			rotate_offset = 3;
+		}
 
 		if (hole[3] == 'b' && hole[0] == 'y' && hole[1] == 'p') {
 			cake_order = 1;
@@ -700,8 +742,8 @@ void judge_the_empty_and_order() {
 		else if (hole[0] == 'b' && hole[1] == 'p' && hole[2] == 'y') {
 			cake_order = 5;
 			mission_array[1] = 1;
-			mission_array[2] = 0;
-			mission_array[3] = 1;
+			mission_array[2] = 1;
+			mission_array[3] = 0;
 			mission_array[4] = 1;
 		}
 		else if (hole[0] == 'y' && hole[1] == 'p' && hole[2] == 'b') {
@@ -730,10 +772,11 @@ void pauseHanoiing() {
 		unsuck_the_cake(7, 1);
 		unsuck_the_cake(4, 1);
 		unsuck_the_cake(3, 1);
-		cake_check(0, cake_layer[0]);
-		cake_check(1, cake_layer[1]);
-		cake_check(2, cake_layer[2]);
-		cake_check(3, cake_layer[3]);
+//		cake_check(0, cake_layer[0]);
+//		cake_check(1, cake_layer[1]);
+//		cake_check(2, cake_layer[2]);
+//		cake_check(3, cake_layer[3]);
+		press_sensor_feedback();
 	}
 
 	while (pauseHanoi != 0) {
@@ -763,7 +806,12 @@ void pauseHanoiing() {
 		for (int i = 0; i < 3; i++)
 			dont_go_down[i] = 0;
 
+		UART_Send_SetMotorPosition(7, 1300, 0);
+		UART_Send_SetMotorPosition(4, 1200, 200);
+		UART_Send_SetMotorPosition(3, 1200, 200);
+//		HAL_Delay(1500);
 		press_sensor_feedback();
+
 	}
 }
 
@@ -851,9 +899,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(1);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 
 		rotate_the_ring(0);
 		mission_array[0] = 2;
@@ -909,10 +973,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(3);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
-
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		rotate_the_ring(0);
 		mission_array[0] = 2;
 		temp_pub = 0;
@@ -967,10 +1046,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(3);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
-
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		rotate_the_ring(0);
 		mission_array[0] = 2;
 		temp_pub = 0;
@@ -1041,9 +1135,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(1);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 
 		rotate_the_ring(0);
 		mission_array[0] = 2;
@@ -1099,9 +1209,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(1);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 
 		rotate_the_ring(0);
 		mission_array[0] = 2;
@@ -1157,9 +1283,25 @@ void Tower_of_Hanoi(int cake_order) {
 		cake_check(1, 0);
 		cake_check(2, 0);
 		cake_check(3, 0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(0);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(3);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 		put_the_cherry(2);
+		if (pauseHanoi == 1) {
+			mission_array[0] = 1;
+			temp_pub = 0;
+		}
 
 		rotate_the_ring(0);
 		mission_array[0] = 2;

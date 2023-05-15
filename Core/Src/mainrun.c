@@ -16,8 +16,8 @@ uint16_t ADC_cake[3] = { 0 }; //PA5 PA6 PA7
 int step1 = 0, dir_state1 = 0, anglegoal = 0, anglebefore = 0;
 int states = 0;
 int step_state1 = 0, ms1 = 0;
-int suck[3] = { 0 };
-int unsuck[3] = { 0 };
+int suck[4] = { 0 };
+int unsuck[4] = { 0 };
 int suck_temp = 0, unsuck_temp = 0;
 int suck_success1 = 0, suck_success4 = 0, suck_success3 = 0;
 int unsuck_success1 = 0, unsuck_success4 = 0, unsuck_success3 = 0;
@@ -46,6 +46,8 @@ int handshake_temp = 0;
 int z = 5, the_gate = 0;
 int disguise = 0, home = 0, steal = 0, putcherry = 0, steady = 1, unload = 0,
 		unload_temp = 0;
+int transfer_the_order = 0;
+int S = 0, US = 0, score_num = 0;
 uint8_t score;
 /*cake_order=1: brown == 1 && yellow == 2 && pink == 3
  cake_order=2: brown == 3 && yellow == 2 && pink == 1
@@ -81,10 +83,10 @@ void mainrun() {
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3); //for pump3 PC8
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4); //for valve3 Pc9
 	//set the cake
-//	hole[0] = 0;
-//	hole[1] = 'y';
-//	hole[2] = 'p';
-//	hole[3] = 'b';
+//	hole[0] = 'b';
+//	hole[1] = 'p';
+//	hole[2] = 'y';
+//	hole[3] = 0;
 	//initialization all the mosfet
 	//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) ADC_cake, 3);
 	__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 0);
@@ -96,10 +98,10 @@ void mainrun() {
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, 0);
 	VL53_Init();
 	//initialization all the servo
-	UART_Send_SetMotorPosition(7, 1200, 300);
-	UART_Send_SetMotorPosition(4, 1200, 300);
-	UART_Send_SetMotorPosition(3, 1200, 300);
-	UART_Send_SetMotorPosition(5, 1200, 300);
+	UART_Send_SetMotorPosition(7, 1250, 300);
+	UART_Send_SetMotorPosition(4, 1250, 300);
+	UART_Send_SetMotorPosition(3, 1250, 300);
+	UART_Send_SetMotorPosition(5, 1250, 300);
 	UART_Send_SetMotorPosition(6, 1000, 300);
 	servo_delay_temp = 1;
 	while (1) {
@@ -108,10 +110,10 @@ void mainrun() {
 		}
 
 	}
-	UART_Send_SetMotorPosition(7, 1250, 300);
-	UART_Send_SetMotorPosition(4, 1250, 300);
-	UART_Send_SetMotorPosition(3, 1250, 300);
-	UART_Send_SetMotorPosition(5, 1250, 300);
+	UART_Send_SetMotorPosition(7, 1350, 300);
+	UART_Send_SetMotorPosition(4, 1300, 300);
+	UART_Send_SetMotorPosition(3, 1300, 300);
+	UART_Send_SetMotorPosition(5, 1300, 300);
 	UART_Send_SetMotorPosition(6, 2100, 300);
 	servo_delay_temp = 1;
 	while (1) {
@@ -121,9 +123,9 @@ void mainrun() {
 
 	}
 	UART_Send_SetMotorPosition(7, 1300, 300);
-	UART_Send_SetMotorPosition(4, 1200, 300);
-	UART_Send_SetMotorPosition(3, 1200, 300);
-	UART_Send_SetMotorPosition(5, 1200, 300);
+	UART_Send_SetMotorPosition(4, 1250, 300);
+	UART_Send_SetMotorPosition(3, 1250, 300);
+	UART_Send_SetMotorPosition(5, 1250, 300);
 	UART_Send_SetMotorPosition(6, 1000, 300);
 	servo_delay_temp = 1;
 	while (1) {
@@ -133,6 +135,7 @@ void mainrun() {
 
 	}
 	VL53_FirstMeasurement();
+
 //	HAL_GPIO_WritePin(Step1_EN_Port, Step1_EN_Pin, GPIO_PIN_RESET);
 //	dir_state1 = 1;
 //	step = 360 * 5 * 8 / 1.8;
@@ -152,7 +155,7 @@ void mainrun() {
 //		dir_state1 = 1;
 ////
 //		arr = 900;
-//		step = 30 * 5 * 8 / 1.8;
+//		step = 5 * 5 * 8 / 1.8;
 //
 //		while (1) {
 //
@@ -173,6 +176,8 @@ void mainrun() {
 //				HAL_GPIO_WritePin(Step1_EN_Port, Step1_EN_Pin, GPIO_PIN_RESET);
 //				dir_state1 = 1;
 //				step = 90 * 5 * 8 / 1.8;
+//				for (int i = 0; i < 3; i++)
+//					rotate_state[i] = 0;
 //			}
 //		}
 //		if_gate_ok = 1;
@@ -219,14 +224,12 @@ void mainrun() {
 //		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 20000 * 255);
 
 //		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 0);
-		HAL_GPIO_WritePin(Step1_EN_Port, Step1_EN_Pin, GPIO_PIN_RESET);
+//		HAL_GPIO_WritePin(Step1_EN_Port, Step1_EN_Pin, GPIO_PIN_RESET);
 //		suck_the_cake(3, 3);
 //		press_sensor_feedback();
 //		HAL_Delay(5000);
 //		unsuck_the_cake(3, 3);
 //		HAL_Delay(5000);
-//		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 20000 * 255); // open pump1
-//		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
 //		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 0); // open pump1
 //		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20000 * 255);
@@ -236,10 +239,12 @@ void mainrun() {
 //			if (servo_delay_temp == 0)
 //				break;
 //		}
+//		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 20000 * 255); // open pump1
+//		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 0);
 
 //		if (k == 0) {
 ////			VL53_Update();
-////			UART_Send_SetMotorPosition(z, place, 500);
+//			UART_Send_SetMotorPosition(z, place, 500);
 ////			judge_the_empty_and_order();
 //			rotate_the_ring(rotate);
 //			k = 1;
@@ -247,6 +252,7 @@ void mainrun() {
 //		rotate_the_ring(rotate);
 //		states = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
 //		HAL_Delay(5000);
+//		VL53_Update();
 		if (servo_delay_temp == 0) {
 
 			if (b_bool == 1 && y_bool == 1 && p_bool == 1 && h_bool == 1) {
@@ -308,13 +314,20 @@ void mainrun() {
 			putcherry = 0;
 
 		}
-//		if (mission_array[0] == 0) {
-//			UART_Send_SetMotorPosition(7, 1300, 300);
-//			UART_Send_SetMotorPosition(4, 1200, 300);
-//			UART_Send_SetMotorPosition(3, 1200, 300);
-//			UART_Send_SetMotorPosition(5, 1200, 300);
-//			UART_Send_SetMotorPosition(6, 950, 300);
-//		}
+		if (mission_array[0] == 0) {
+			UART_Send_SetMotorPosition(7, 1300, 300);
+			UART_Send_SetMotorPosition(4, 1250, 300);
+			UART_Send_SetMotorPosition(3, 1250, 300);
+			UART_Send_SetMotorPosition(5, 1250, 300);
+			UART_Send_SetMotorPosition(6, 950, 300);
+		}
+		if (transfer_the_order == 1) {
+			judge_the_empty_and_order();
+			mission_array[0] = 3;
+			temp_pub = 0;
+			cake_order = -1;
+			transfer_the_order = 0;
+		}
 		if (finish == 1) {
 			finish_all_motion();
 		}
@@ -366,29 +379,29 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				rotate_temp++;
 			}
 			if (temp == 2) {
-				if (step > 300) {
+				if (step > 250) {
 					arr = arr - 4;
-					if (arr < 150)
-						arr = 150;
+					if (arr < 140)
+						arr = 140;
 					__HAL_TIM_SET_AUTORELOAD(&htim6, arr);
 					temp = 0;
 				}
 
-				if (step <= 300) {
+				if (step <= 250) {
 					arr = arr + 4;
 					__HAL_TIM_SET_AUTORELOAD(&htim6, arr);
 					temp = 0;
 
 				}
 			}
-			if (flag == 0 && rotate_temp >= 444) {
+			if (flag == 0 && rotate_temp >= 444 && if_gate_ok != 2) {
 				flag = 1;
 				rotate_state[0] = 0;
 				rotate_state[1] = 0;
 				rotate_state[2] = 0;
 			}
 			if (rotate_state[0] + rotate_state[1] + rotate_state[2] == 3
-					&& rotate_temp >= 444) {
+					&& rotate_temp >= 444 && if_gate_ok != 2) {
 				rotate_state[0] = 0;
 				rotate_state[1] = 0;
 				rotate_state[2] = 0;
@@ -399,7 +412,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if (rotate_temp >= 444 && flag == 1) {
 				if (rotate_state[0] == 0 && rotate_state[1] == 1
 						&& rotate_state[2] == 1
-						&& (rotate_dir == 3 || rotate_dir == 1)) {
+						&& (rotate_dir == 3 || rotate_dir == 1)
+						&& if_gate_ok != 2) {
 //						step1 = 2.86 * 5 * 8 / 1.8;
 					rotate_dir = 0;
 					rotate_state[0] = 0;
@@ -411,7 +425,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				}
 				else if (rotate_state[0] == 1 && rotate_state[1] == 1
 						&& rotate_state[2] == 0
-						&& (rotate_dir == 0 || rotate_dir == 2)) {
+						&& (rotate_dir == 0 || rotate_dir == 2)
+						&& if_gate_ok != 2) {
 //						step1 = 2.86 * 5 * 8 / 1.8;
 					rotate_dir = 1;
 					rotate_state[0] = 0;
@@ -423,7 +438,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				}
 				else if (rotate_state[0] == 1 && rotate_state[1] == 0
 						&& rotate_state[2] == 0
-						&& (rotate_dir == 1 || rotate_dir == 3)) {
+						&& (rotate_dir == 1 || rotate_dir == 3)
+						&& if_gate_ok != 2) {
 //						step1 = 2.86 * 5 * 8 / 1.8;
 					rotate_dir = 2;
 					rotate_state[0] = 0;
@@ -435,7 +451,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				}
 				else if (rotate_state[0] == 0 && rotate_state[1] == 0
 						&& rotate_state[2] == 1
-						&& (rotate_dir == 2 || rotate_dir == 0)) {
+						&& (rotate_dir == 2 || rotate_dir == 0)
+						&& if_gate_ok != 2) {
 //						step1 = 2.86 * 5 * 8 / 1.8;
 					rotate_dir = 3;
 					rotate_state[0] = 0;
@@ -491,7 +508,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if (i1 == 500) {
 				suck_success1 = 1;
 				suck[0] = 0;
-				UART_Send_SetMotorPosition(7, 1300, 200);
+				UART_Send_SetMotorPosition(7, 1300, 0);
 				i1 = 0;
 				suck_temp--;
 				//			}
@@ -564,6 +581,74 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 //
 //	}
 	if (htim->Instance == TIM10) {
+		for (int i = 0; i < 4; i++) {
+			if (suck[i] == 1) {
+				if (S == 0 && i == 0) {
+					UART_Send_SetMotorPosition(7, 1440, 200);
+				}
+				if (S == 0 && i == 1) {
+					UART_Send_SetMotorPosition(4, 1440, 200);
+				}
+				if (S == 0 && i == 2) {
+					UART_Send_SetMotorPosition(3, 1440, 200);
+				}
+				if (S == 1 && i == 0) {
+					UART_Send_SetMotorPosition(7, 1500, 200);
+				}
+				if (S == 1 && i == 1) {
+					UART_Send_SetMotorPosition(4, 1500, 200);
+				}
+				if (S == 1 && i == 2) {
+					UART_Send_SetMotorPosition(3, 1500, 200);
+				}
+				if (S == 1 && i == 3) {
+					UART_Send_SetMotorPosition(5, 1330, 300);
+				}
+				if (S == 2 && i == 0) {
+					UART_Send_SetMotorPosition(7, 1590, 200);
+				}
+				if (S == 2 && i == 1) {
+					UART_Send_SetMotorPosition(4, 1590, 200);
+				}
+				if (S == 2 && i == 2) {
+					UART_Send_SetMotorPosition(3, 1590, 200);
+				}
+				if (S == 2 && i == 3) {
+					UART_Send_SetMotorPosition(5, 1350, 300);
+				}
+				if (S == 3 && i == 0) {
+					UART_Send_SetMotorPosition(7, 1715, 200);
+				}
+				if (S == 3 && i == 1) {
+					UART_Send_SetMotorPosition(4, 1715, 200);
+				}
+				if (S == 3 && i == 2) {
+					UART_Send_SetMotorPosition(3, 1715, 200);
+				}
+				if (S == 3 && i == 3) {
+					UART_Send_SetMotorPosition(5, 1450, 200);
+				}
+
+			}
+			if (unsuck[i] == 1) {
+				if (i == 0)
+					UART_Send_SetMotorPosition(7, 1480, 200);
+				if (i == 1)
+					UART_Send_SetMotorPosition(4, 1480, 200);
+				if (i == 2)
+					UART_Send_SetMotorPosition(3, 1480, 200);
+			}
+			if (unsuck[i] == 0 || suck[i] == 0) {
+				if (i == 0)
+					UART_Send_SetMotorPosition(7, 1300, 200);
+				if (i == 1)
+					UART_Send_SetMotorPosition(4, 1200, 200);
+				if (i == 2)
+					UART_Send_SetMotorPosition(3, 1200, 200);
+				if (i == 3)
+					UART_Send_SetMotorPosition(5, 1200, 200);
+			}
+		}
 		the_gate++;
 		door_temp++;
 		handshake_temp++;
@@ -583,12 +668,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		}
 		if (servo_delay_temp == 1) {
 			servo_delay++;
-			if (servo_delay == 50) {
+			if (servo_delay == 40) {
 				servo_delay = 0;
 				servo_delay_temp = 0;
 			}
 		}
-		if (door_temp == 1) {
+		if (door_temp == 10) {
 			pub_the_hand_transfer();
 			door_temp = 0;
 
@@ -600,14 +685,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				cherry_delay_temp = 0;
 			}
 		}
-		if (handshake_temp == 10) {
-			hand_shake();
-			handshake_temp = 0;
-		}
-		if (the_gate == 1) {
-			pub_the_gate();
-			the_gate = 0;
-		}
+//		if (handshake_temp == 10) {
+//			hand_shake();
+//			handshake_temp = 0;
+//		}
+//		if (the_gate == 1) {
+//			pub_the_gate();
+//			the_gate = 0;
+//		}
 		if (mission_array[0] >= 1 && temp_pub < 1) {
 			pub_to_ros();
 			temp_pub++;
@@ -619,10 +704,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 				HAL_UART_Transmit_IT(&huart1, &score, sizeof(score));
 			}
 		}
-		for (int i = 0; i < 10; i++) {
-			if (score_flag[i] == 1) {
+		for (score_num = 0; score_num < 10; score_num++) {
+			if (score_flag[score_num] >= 1) {
 				score_transfer();
-				score_flag[i] = 0;
+				score_flag[score_num] -= 1;
 			}
 		}
 

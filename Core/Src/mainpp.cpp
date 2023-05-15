@@ -1,5 +1,4 @@
 #include <mainpp.h>
-
 #include "std_msgs/String.h"
 
 #include "string"
@@ -10,7 +9,7 @@ char handshake[2] = { 0 };
 extern int counttry;
 extern int tower_step, temp_pub;
 extern int finish, disguise, home, steal, putcherry, score_flag[10], unload,
-		unload_temp;
+		unload_temp, transfer_the_order, cake_order;
 void cake_callback(const std_msgs::String &msg) {
 	handshake[0] = msg.data[0];
 	handshake[1] = msg.data[1];
@@ -78,10 +77,14 @@ void cake_callback(const std_msgs::String &msg) {
 		if (msg.data[1] == '2') {
 			pauseHanoi = 0;
 		}
+		if (msg.data[1] == '4') {
+			transfer_the_order = 1;
+
+		}
 	}
-	else if (msg.data[0] == '0') {
-		if (mission_array[(size_t) (msg.data[1] - '0')] == 1) {
-			score_flag[mission_array[(size_t) (msg.data[1] - '0')]] = 1;
+	else if (msg.data[0] == 'o') {
+		if (mission_array[(size_t) (msg.data[1] - '0' + 1)] == 1) {
+			score_flag[(size_t) (msg.data[1] - '0')] += 1;
 		}
 	}
 	else if (msg.data[0] == 'u') {
@@ -90,20 +93,20 @@ void cake_callback(const std_msgs::String &msg) {
 
 	}
 	else if (msg.data[0] == 'd') {
-		score_flag[4] = 1;
+		score_flag[4] += 1;
 		disguise = 1;
 
 	}
 	else if (msg.data[0] == 'f') {
-		score_flag[5] = 1;
+		score_flag[5] += 1;
 		finish = 1;
 	}
 	else if (msg.data[0] == 'A') {
-		score_flag[6] = 1;
+		score_flag[6] += 1;
 		home = 1;
 	}
 	else if (msg.data[0] == 't') {
-		score_flag[7] = 1;
+		score_flag[7] += 1;
 		steal++;
 	}
 	else if (msg.data[0] == 'r') {

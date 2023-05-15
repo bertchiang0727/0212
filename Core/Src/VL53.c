@@ -24,6 +24,8 @@ VL53L0X_DEV vl53_dev[3];
 int GroundHeight[3];
 int CakeStatus[3];
 
+const int CAKE_HEIGHT[3] = { 19, 20, 20 };
+
 int CakeHeightGate[3][3];
 
 void VL53_Init() {
@@ -121,9 +123,9 @@ void VL53_FirstMeasurement() {
 	}
 
 	for (size_t i = 0; i < 3; i++) {
-		CakeHeightGate[i][0] = GroundHeight[i] - CAKE_HEIGHT / 2;
-		CakeHeightGate[i][1] = CakeHeightGate[i][0] - CAKE_HEIGHT;
-		CakeHeightGate[i][2] = CakeHeightGate[i][1] - CAKE_HEIGHT;
+		CakeHeightGate[i][0] = GroundHeight[i] - CAKE_HEIGHT[i] / 2;
+		CakeHeightGate[i][1] = CakeHeightGate[i][0] - CAKE_HEIGHT[i];
+		CakeHeightGate[i][2] = CakeHeightGate[i][1] - CAKE_HEIGHT[i];
 	}
 }
 
